@@ -1,0 +1,14 @@
+# PWA (Progressive Web App) Examples image:https://travis-ci.org/daggerok/pwa-examples.svg?branch=master["Build Status", link="https://travis-ci.org/daggerok/pwa-examples"]
+
+=== steps
+
+. link:01-manifest/[manifest]
+
+=== build, run, deploy
+
+[source,bash]
+----
+yarn -i
+yarn start
+yarn deploy
+----

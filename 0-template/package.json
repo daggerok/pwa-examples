@@ -1,0 +1,60 @@
+{
+  "title": "pwa-examples",
+  "name": "pwa-examples",
+  "version": "0.0.0",
+  "description": "Progressive Web App",
+  "keywords": [
+    "css",
+    "sass",
+    "html",
+    "responsive",
+    "theme",
+    "template"
+  ],
+  "bugs": {
+    "url": "https://github.com/daggerok/pwa-examples/issues"
+  },
+  "license": "MIT",
+  "author": "Maksim Kostormin",
+  "contributors": [
+    "Maksim Kostormin"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/daggerok/pwa-examples.git"
+  },
+  "devDependencies": {
+    "@types/node": "8.0.26",
+    "bower": "1.8.0",
+    "gh-pages": "1.0.0",
+    "livereload": "0.6.2",
+    "ncp": "2.0.0",
+    "npm-run-all": "4.1.1",
+    "serve": "6.0.6"
+  },
+  "livereload": {
+    "exclusions": [
+      "node_modules",
+      ".git*",
+      ".travis.yml",
+      ".gitignore",
+      "*.json",
+      "LICENSE",
+      "README.md",
+      "yarn.lock"
+    ]
+  },
+  "scripts": {
+    "postinstall": "bower install",
+    "start": "yarn -i; npm-run-all -p start:*",
+    "start:serve": "serve --cors --open --single --port 3000 --ignore 'node_modules,.idea' ./",
+    "start:livereload": "livereload",
+    "predeploy": "yarn -i && npm-run-all predeploy:*",
+    "predeploy:bash-pre": "bash ./deployment/predeploy.bash ./index.html",
+    "predeploy:404-html": "ncp ./index.html ./404.html",
+    "predeploy:nojekyll": "touch .nojekyll",
+    "deploy": "gh-pages --dist ./ --src '{bower_components/**,css/**,img/**,js/**,.nojekyll,404.html,favicon.ico,index.html}' --branch gh-pages --dotfiles=true -m \"Github Pages $(date +%Y-%m-%d) deployment\"",
+    "postdeploy": "bash ./deployment/postdeploy.bash ./index.html"
+  },
+  "homepage": "http://daggerok.github.io/pwa-examples"
+}
