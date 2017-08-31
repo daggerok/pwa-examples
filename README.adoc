@@ -5,6 +5,7 @@ This repository contains some PWA examples playground projects.
 === steps
 
 . link:01-manifest/[manifest]
+. link:02-service-worker/[service-worker]
 
 === build, run, deploy
 

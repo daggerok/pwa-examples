@@ -1,0 +1,18 @@
+# PWA (Progressive Web App) service-workers image:https://travis-ci.org/daggerok/pwa-examples.svg?branch=master["Build Status", link="https://travis-ci.org/daggerok/pwa-examples"]
+
+Secondly, we need to add service-worker
+
+. offline
+. caching
+. push-notification (special events, like new articles or posts)
+
+link:http://www.pwabuilder.com/[service worker generator]
+
+=== build, run, deploy
+
+[source,bash]
+----
+yarn -i
+yarn start
+yarn deploy
+----
