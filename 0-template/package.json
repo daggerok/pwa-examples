@@ -49,7 +49,7 @@
     "predeploy:bash-pre": "bash ./deployment/predeploy.bash ./index.html",
     "predeploy:404-html": "ncp ./index.html ./404.html",
     "predeploy:nojekyll": "touch .nojekyll",
-    "deploy": "gh-pages --dist ./ --src '{bower_components/**,css/**,img/**,js/**,.nojekyll,404.html,favicon.ico,index.html}' --branch gh-pages --dotfiles=true -m \"Github Pages $(date +%Y-%m-%d) deployment\"",
+    "deploy": "gh-pages --dist ./ --src '{app/**,bower_components/**,.nojekyll,404.html,index.html}' --branch gh-pages --dotfiles=true -m \"Github Pages $(date +%Y-%m-%d) deployment\"",
     "postdeploy": "bash ./deployment/postdeploy.bash ./index.html"
   },
   "homepage": "http://daggerok.github.io/pwa-examples"
