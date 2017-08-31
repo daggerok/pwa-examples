@@ -35,11 +35,7 @@
   "livereload": {
     "exclusions": [
       "node_modules",
-      ".git*",
-      ".travis.yml",
-      ".gitignore",
       "*.json",
-      "LICENSE",
       "README.md",
       "yarn.lock"
     ]

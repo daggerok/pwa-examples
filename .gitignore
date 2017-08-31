@@ -6,3 +6,4 @@ yarn.lock
 404.html
 *-e
 .DS_Store
+.idea
