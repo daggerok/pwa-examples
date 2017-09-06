@@ -7,3 +7,4 @@ yarn.lock
 *-e
 .DS_Store
 .idea
+dist

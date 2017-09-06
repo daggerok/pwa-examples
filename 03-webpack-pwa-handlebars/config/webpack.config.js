@@ -52,7 +52,7 @@ module.exports = env => ({
       },
 
       {
-        test: /\.css$/i,
+        test: /\.s?css$/i,
         use: ExtractTextWebpackPlugin.extract({
           use: [
             'exports-loader?module.exports.toString()',
@@ -65,6 +65,16 @@ module.exports = env => ({
                 sourceMap: env === 'development',
               },
             },
+            {
+              loader: 'postcss-loader',
+              options: {
+                plugins: (loader) => [
+                  require('postcss-smart-import'),
+                  require('autoprefixer'),
+                ],
+              },
+            },
+            'sass-loader',
           ],
           fallback: 'style-loader',
           publicPath: env === 'gh-pages' ? '/pwa-examples/' : '/',
