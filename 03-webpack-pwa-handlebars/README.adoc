@@ -1,0 +1,10 @@
+# Webpack Handlebars PWA image:https://travis-ci.org/daggerok/pwa-examples.svg?branch=master["Build Status", link="https://travis-ci.org/daggerok/pwa-examples"]
+
+=== build, run, deploy
+
+[source,bash]
+----
+yarn -i
+yarn start
+yarn deploy
+----

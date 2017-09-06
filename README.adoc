@@ -6,6 +6,7 @@ This repository contains some PWA examples playground projects.
 
 . link:01-manifest/[manifest]
 . link:02-service-worker/[service-worker]
+. link:03-webpack-pwa-handlebars/[plain PWA]
 
 === build, run, deploy
 
