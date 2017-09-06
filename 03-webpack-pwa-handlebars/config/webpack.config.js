@@ -28,6 +28,7 @@ module.exports = env => ({
   context: resolve('./'),
 
   entry: {
+    //'service-worker-register': './src/service-worker-register.js',
     polyfills: './src/polyfills.js',
     vendors: './src/vendors.js',
     app: './src/main.js',
@@ -55,7 +56,14 @@ module.exports = env => ({
         test: /\.s?css$/i,
         use: ExtractTextWebpackPlugin.extract({
           use: [
-            'exports-loader?module.exports.toString()',
+            {
+              loader: 'exports-loader',
+              options: {
+                module: {
+                  exports: toString,
+                }
+              },
+            },
             {
               loader: 'css-loader',
               options: {
@@ -74,11 +82,17 @@ module.exports = env => ({
                 ],
               },
             },
-            'sass-loader',
+            {
+              loader: 'sass-loader',
+            },
           ],
           fallback: 'style-loader',
           publicPath: env === 'gh-pages' ? '/pwa-examples/' : '/',
         }),
+        include: [
+          resolve('./src'),
+          resolve('./node_modules/bootstrap/dist/css'),
+        ],
       },
 
       {
@@ -149,12 +163,7 @@ module.exports = env => ({
     }),
 
     // extract css into its own file
-    env === 'development' ? undefined : new ExtractTextWebpackPlugin({
-      filename: `[name]-${env}.css?v=${version}`,
-      disable: false,
-      allChunks: true,
-      publicPath: env === 'gh-pages' ? '/pwa-examples/' : '/',
-    }),
+    new ExtractTextWebpackPlugin(`[name]-${env}.css?v=${version}`),
 
     // Compress extracted CSS. We are using this plugin so that possible
     // duplicated CSS from different components can be deduped.
@@ -211,6 +220,27 @@ module.exports = env => ({
       '.css',
       '.hbs',
     ],
+  },
+
+  devServer: {
+    port: 8000,
+    compress: env !== 'development',
+    inline: env === 'development',
+    stats: 'minimal',
+
+    contentBase: resolve('./dist'),
+
+    historyApiFallback: {
+      index: env === 'gh-pages' ? '/pwa-examples/' : '/',
+    },
+
+    proxy: {
+      '/api': () => ({
+        target: 'http://localhost:8080',
+        changeOrign: false,
+        secure: false,
+      }),
+    },
   },
 
 });
