@@ -1,13 +1,12 @@
-const { join } = require('path');
-const resolve = rel => join(process.cwd(), rel);
-const { version } = require('../package.json');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const SplitWebpackPlugin = require('split-webpack-plugin');
 const { BaseHrefWebpackPlugin } = require('base-href-webpack-plugin');
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
 const ExtractTextWebpackPlugin = require('extract-text-webpack-plugin');
 const OptimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin');
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
+
 const {
   HotModuleReplacementPlugin,
   NoEmitOnErrorsPlugin,
@@ -17,11 +16,36 @@ const {
   DefinePlugin,
   optimize
 } = require('webpack');
+
 const {
+  AggressiveSplittingPlugin,
   AggressiveMergingPlugin,
   CommonsChunkPlugin,
   UglifyJsPlugin,
 } = optimize;
+
+const { join } = require('path');
+const resolve = rel => join(process.cwd(), rel);
+
+const { version } = require('../package.json');
+
+const babel = {
+  "presets": [
+    [
+      "env",
+      {
+        "targets": {
+          "chrome": 52,
+          "node": "current",
+          "browsers": [
+            "last 2 versions",
+            "safari >= 7",
+          ],
+        },
+      },
+    ],
+  ],
+};
 
 module.exports = env => ({
 
@@ -47,6 +71,15 @@ module.exports = env => ({
       {
         test: /\.(hbs|handlebars)$/i,
         loader: 'handlebars-loader',
+        include: [
+          resolve('./src'),
+        ],
+      },
+
+      {
+        test: /\.(es6|jsx?)$/i,
+        loader: 'babel-loader',
+        options: babel,
         include: [
           resolve('./src'),
         ],
@@ -125,29 +158,45 @@ module.exports = env => ({
   },
 
   plugins: [
+/*
+    new SplitWebpackPlugin({
+      chunks: ['polyfills'],
+      size: 128, // kb
+    }),
 
+    new SplitWebpackPlugin({
+      chunks: ['vendors'],
+      size: 128, // kb
+      // divide: 2,
+    }),
+
+    new SplitWebpackPlugin({
+      chunks: ['app'],
+      size: 128, // kb
+    }),
+*/
+    ...(env !== 'development' ? ['app', 'vendors', 'polyfills'] : [])
+      .map(chunk => new SplitWebpackPlugin({
+        chunks: [chunk],
+        size: 256, // kb,
+        // divide: 2,
+      })),
+/*
     new CommonsChunkPlugin({
-      // name: 'vendors',
       names: [
         'app',
         'vendors',
         'polyfills',
         'manifest',
+        // 'service-worker-register',
       ],
     }),
-
+*/
     new HtmlWebpackPlugin({
       cache: true,
       showErrors: true,
       excludeChunks: [],
       xhtml: true,
-      // // chunks: 'all',
-      // chunks: [
-      //   'manifest',
-      //   'polyfills',
-      //   'vendors',
-      //   'app',
-      // ],
       template: './src/index.hbs',
       favicon: './src/favicon.ico',
       minify: env !== 'development' ? {
@@ -162,7 +211,6 @@ module.exports = env => ({
       baseHref: env === 'gh-pages' ? '/pwa-examples/' : '/',
     }),
 
-    // extract css into its own file
     new ExtractTextWebpackPlugin(`[name]-${env}.css?v=${version}`),
 
     // Compress extracted CSS. We are using this plugin so that possible
@@ -182,20 +230,20 @@ module.exports = env => ({
     ]),
 
     new ProvidePlugin({
-      'jQuery': 'jquery', // bootstrap/dist/js/bootstrap.js required jQuery from jquery
-      'Popper': 'popper.js', // bootstrap/dist/js/bootstrap.js required jQuery from jquery
+      'jQuery': 'jquery', // bootstrap@4
+      'Popper': 'popper.js', // bootstrap@4
     }),
-
-    /*
-    new EnvironmentPlugin({ // use DefinePlugin instead
-      'NODE_ENV': env === 'development' ? env : 'production',
-    }),
-    */
 
     new DefinePlugin({
       'process.env': {
         NODE_ENV: JSON.stringify(env === 'development' ? env : 'production'),
       },
+    }),
+
+    // Alternatively, the EnvironmentPlugin supports an object, which maps keys to their default values.
+    // The default value for a key is taken if the key is undefined in process.env.
+    new EnvironmentPlugin({
+      'NODE_ENV': 'development',
     }),
 
     env === 'development' ? new NoEmitOnErrorsPlugin() : undefined,
@@ -206,10 +254,10 @@ module.exports = env => ({
 
     new CompressionWebpackPlugin({
       asset: '[path].gz?[query]', // default: [path].gz[query]
-      // algorithm: 'gzip', // zlib, zopfli, function(buf, callback)
+      algorithm: 'gzip', // zlib, zopfli, function(buf, callback)
       // test: /\.(js|css|html)$/i, // default: every assets
-      // threshold: 10240, // default: 0
-      // minRatio: 0.8 // default: Only assets that compress better that ratio: 0.8
+      threshold: 10240, // default: 0
+      minRatio: 0.8 // default: Only assets that compress better that ratio: 0.8
     }),
 
   ].filter(p => !!p),
