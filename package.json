@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@types/handlebars": "4.0.36"
+  }
+}
