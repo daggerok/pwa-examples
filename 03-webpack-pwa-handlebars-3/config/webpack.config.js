@@ -18,10 +18,8 @@ const {
 } = require('webpack');
 
 const {
-  AggressiveSplittingPlugin,
   AggressiveMergingPlugin,
   CommonsChunkPlugin,
-  UglifyJsPlugin,
 } = optimize;
 
 const { join } = require('path');
@@ -86,8 +84,10 @@ module.exports = env => ({
       },
 
       {
-        test: /\.s?css$/i,
+        test: /\.(s?css)$/i,
         use: ExtractTextWebpackPlugin.extract({
+          publicPath: env === 'gh-pages' ? '/pwa-examples/' : '/',
+          fallback: 'style-loader',
           use: [
             {
               loader: 'exports-loader',
@@ -112,52 +112,58 @@ module.exports = env => ({
                 plugins: (loader) => [
                   require('postcss-smart-import'),
                   require('autoprefixer'),
+                  require('rucksack-css'),
+                  require('precss'),
                 ],
+                sourceMap:  env === 'development' ? 'inline' : false,
               },
             },
             {
               loader: 'sass-loader',
             },
           ],
-          fallback: 'style-loader',
-          publicPath: env === 'gh-pages' ? '/pwa-examples/' : '/',
         }),
         include: [
           resolve('./src'),
-          resolve('./node_modules/bootstrap/dist/css'),
+          resolve('./node_modules/bootstrap'),
+          resolve('./node_modules/bootswatch'),
+          resolve('./node_modules/font-awesome'),
+          resolve('./node_modules/roboto-fontface'),
         ],
       },
 
       {
-        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/i,
+        test: /\.(png|jpe?g|gif|svg|woff2?|eot|ttf|otf|mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/i,
         loader: 'url-loader',
         options: {
           limit: 10000,
-          name: `[name]-${env}.[ext]?v=${version}`,
+          name: `[path]/[name].[ext]?v=${version}`,
         },
+        exclude: /\/node_modules\//,
       },
 
       {
-        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/i,
+        test: /\.(png|jpe?g|gif|svg|woff2?|eot|ttf|otf|mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/i,
         loader: 'url-loader',
         options: {
           limit: 10000,
-          name: `[name]-${env}.[ext]?v=${version}`,
+          name: `vendors/[1]?v=${version}`,
+          regExp: /\/node_modules\/(.*)/,
         },
-      },
-
-      {
-        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          name: `[name]-${env}.[ext]?v=${version}`,
-        },
+        include: /\/node_modules\//,
       },
     ],
   },
 
   plugins: [
+
+    new ProvidePlugin({
+      $: 'jquery', // bootstrap
+      jQuery: 'jquery', // bootstrap
+      'window.jQuery': 'jquery', // bootstrap
+      // Popper: ['popper.js', 'default'], // bootstrap
+      // Tether: 'tether', // bootstrap
+    }),
 /*
     new SplitWebpackPlugin({
       chunks: ['polyfills'],
@@ -174,14 +180,14 @@ module.exports = env => ({
       chunks: ['app'],
       size: 128, // kb
     }),
-*/
-    ...(env !== 'development' ? ['app', 'vendors', 'polyfills'] : [])
+
+    ...(env !== 'development' ? ['app', 'vendors', 'polyfills', 'manifest'] : [])
       .map(chunk => new SplitWebpackPlugin({
         chunks: [chunk],
         size: 256, // kb,
         // divide: 2,
       })),
-/*
+*/
     new CommonsChunkPlugin({
       names: [
         'app',
@@ -191,7 +197,7 @@ module.exports = env => ({
         // 'service-worker-register',
       ],
     }),
-*/
+
     new HtmlWebpackPlugin({
       cache: true,
       showErrors: true,
@@ -228,11 +234,6 @@ module.exports = env => ({
     new CopyWebpackPlugin([
       { from: './static' }
     ]),
-
-    new ProvidePlugin({
-      'jQuery': 'jquery', // bootstrap@4
-      'Popper': 'popper.js', // bootstrap@4
-    }),
 
     new DefinePlugin({
       'process.env': {

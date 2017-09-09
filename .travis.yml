@@ -15,7 +15,9 @@ before_script:
 script:
   - export ROOT=$PWD
   - >
-    for path in 03-webpack-pwa-handlebars \
+    for path in 03-webpack-pwa-handlebars-3 \
+                03-webpack-pwa-handlebars-2 \
+                03-webpack-pwa-handlebars-1 \
                 02-service-worker \
                 01-manifest \
                 0-template; do
