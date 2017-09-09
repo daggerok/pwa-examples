@@ -15,7 +15,7 @@ before_script:
 script:
   - export ROOT=$PWD
   - >
-    for path in 03-webpack-pwa-handlebars-3 \
+    for path in 04-webpack-handlebars-bootswatch \
                 03-webpack-pwa-handlebars-2 \
                 03-webpack-pwa-handlebars-1 \
                 02-service-worker \

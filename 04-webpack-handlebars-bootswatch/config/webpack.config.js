@@ -1,6 +1,5 @@
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const SplitWebpackPlugin = require('split-webpack-plugin');
 const { BaseHrefWebpackPlugin } = require('base-href-webpack-plugin');
 const CompressionWebpackPlugin = require('compression-webpack-plugin');
 const ExtractTextWebpackPlugin = require('extract-text-webpack-plugin');
@@ -10,7 +9,6 @@ const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
 const {
   HotModuleReplacementPlugin,
   NoEmitOnErrorsPlugin,
-  LoaderOptionsPlugin,
   EnvironmentPlugin,
   ProvidePlugin,
   DefinePlugin,
@@ -50,7 +48,6 @@ module.exports = env => ({
   context: resolve('./'),
 
   entry: {
-    //'service-worker-register': './src/service-worker-register.js',
     polyfills: './src/polyfills.js',
     vendors: './src/vendors.js',
     app: './src/main.js',
@@ -97,6 +94,7 @@ module.exports = env => ({
                 }
               },
             },
+
             {
               loader: 'css-loader',
               options: {
@@ -106,6 +104,9 @@ module.exports = env => ({
                 sourceMap: env === 'development',
               },
             },
+
+            { loader: 'resolve-url-loader', },
+
             {
               loader: 'postcss-loader',
               options: {
@@ -118,18 +119,15 @@ module.exports = env => ({
                 sourceMap:  env === 'development' ? 'inline' : false,
               },
             },
+
             {
               loader: 'sass-loader',
+              options: {
+                sourceMap: env === 'development',
+              },
             },
           ],
         }),
-        include: [
-          resolve('./src'),
-          resolve('./node_modules/bootstrap'),
-          resolve('./node_modules/bootswatch'),
-          resolve('./node_modules/font-awesome'),
-          resolve('./node_modules/roboto-fontface'),
-        ],
       },
 
       {
@@ -152,6 +150,33 @@ module.exports = env => ({
         },
         include: /\/node_modules\//,
       },
+
+      {
+        test: require.resolve('jquery'),
+        use: [{
+          loader: 'expose-loader',
+          options: 'jQuery',
+        },{
+          loader: 'expose-loader',
+          options: '$',
+        }]
+      },
+
+      {
+        test: require.resolve('popper.js'),
+        use: [{
+          loader: 'expose-loader',
+          options: 'Popper',
+        }]
+      },
+
+      {
+        test: require.resolve('tether'),
+        use: [{
+          loader: 'expose-loader',
+          options: 'Tether',
+        }]
+      },
     ],
   },
 
@@ -161,33 +186,10 @@ module.exports = env => ({
       $: 'jquery', // bootstrap
       jQuery: 'jquery', // bootstrap
       'window.jQuery': 'jquery', // bootstrap
-      // Popper: ['popper.js', 'default'], // bootstrap
-      // Tether: 'tether', // bootstrap
-    }),
-/*
-    new SplitWebpackPlugin({
-      chunks: ['polyfills'],
-      size: 128, // kb
+      Popper: ['popper.js', 'default'], // bootstrap
+      Tether: 'tether', // bootstrap
     }),
 
-    new SplitWebpackPlugin({
-      chunks: ['vendors'],
-      size: 128, // kb
-      // divide: 2,
-    }),
-
-    new SplitWebpackPlugin({
-      chunks: ['app'],
-      size: 128, // kb
-    }),
-
-    ...(env !== 'development' ? ['app', 'vendors', 'polyfills', 'manifest'] : [])
-      .map(chunk => new SplitWebpackPlugin({
-        chunks: [chunk],
-        size: 256, // kb,
-        // divide: 2,
-      })),
-*/
     new CommonsChunkPlugin({
       names: [
         'app',

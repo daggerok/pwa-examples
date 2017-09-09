@@ -9,10 +9,10 @@
   "homepage": "http://daggerok.github.io/pwa-examples",
   "scripts": {
     "rimraf-dist": "rimraf -rf ./dist",
-    "webpack": "webpack --config ./config/webpack.config.js",
+    "webpack": "webpack --bail --progress --profile=web --config ./config/webpack.config.js",
     "start": "yarn -i; webpack-dev-server --config ./config/webpack.config.js --env development -w --progress",
     "prebuild": "yarn -i; yarn rimraf-dist",
-    "build": "webpack --env=production --config ./config/webpack.config.js",
+    "build": "yarn webpack -- --env=production -p",
     "preserve": "yarn build",
     "serve": "npm-run-all -p start:*",
     "start:serve": "serve --cors --open --single --port 3000 --ignore 'node_modules,.idea' ./dist",
@@ -27,11 +27,12 @@
   "dependencies": {
     "babel-polyfill": "6.26.0",
     "bootstrap": "3.3.7",
-    "bootstrap-sass": "3.3.7",
     "bootswatch": "3.3.7",
     "handlebars": "4.0.10",
     "jquery": "3.2.1",
-    "roboto-fontface": "0.8.0"
+    "popper.js": "1.12.5",
+    "roboto-fontface": "0.8.0",
+    "tether": "1.4.0"
   },
   "devDependencies": {
     "@types/extract-text-webpack-plugin": "2.1.0",
@@ -69,7 +70,6 @@
     "sass-loader": "6.0.6",
     "script-ext-html-webpack-plugin": "1.8.5",
     "serve": "6.0.6",
-    "split-webpack-plugin": "1.1.0",
     "style-loader": "0.18.2",
     "url-loader": "0.5.9",
     "webpack": "3.5.6",
